@@ -37,31 +37,28 @@ A aplicação está hospedada gratuitamente via GitHub Pages:
 
 3. Acesse http://localhost:5000 no navegador
 
+## 🖼️ Screenshot
+
+![image](https://github.com/user-attachments/assets/98e7e77a-ec93-428b-ac70-66d883f61e44)
+
 ## 📌 Funcionalidades futuras (em desenvolvimento)
 
-💰 Simulador de premiação (acertos de 4, 5 ou 6 números)
+- 💰 Simulador de premiação (acertos de 4, 5 ou 6 números)
 
-📂 Histórico dos jogos gerados
+- 📂 Histórico dos jogos gerados
 
-🌙 Modo noturno com toggle
+- 🌙 Modo noturno com toggle
 
-📄 Exportar apostas em PDF ou imagem
+- 📄 Exportar apostas em PDF ou imagem
 
-🧠 Sugestão inteligente de jogos com base nos últimos sorteios
+- 🧠 Sugestão inteligente de jogos com base nos últimos sorteios
 
 ## 🧑‍💻 Autor
 
-Gabriel Rodrigues
-🔗 linkedin.com/in/gabriel-rodrigues
-💼 Desenvolvedor .NET Fullstack com foco em soluções criativas e web apps modernos.
+- Gabriel Rodrigues
+- 🔗 linkedin.com/in/gabriel-rodrigues
+- 💼 Desenvolvedor .NET Fullstack com foco em soluções criativas e web apps modernos.
 
 ## 📄 Licença
 
-Este projeto é livre para fins educacionais e uso pessoal.
-
-### ✅ Como usar
-
-Salve esse conteúdo no arquivo `README.md` dentro do seu repositório.  
-Se quiser, posso adaptar com um badge, print ou gif da interface também!
-
-Quer que eu gere o `.md` pronto pra download? Só falar!
+- Este projeto é livre para fins educacionais e uso pessoal.
