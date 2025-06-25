@@ -5,12 +5,10 @@
 @inject MegaSenaService MegaSenaService
 @inject IJSRuntime JS
 
-<PageTitle>Gerador de Números da Sorte</PageTitle>
-
 <div class="container">
     <audio id="plimSound" src="sounds/plim.mp3" preload="auto"></audio>
     <h1>Gerador da Sorte 🍀</h1>
-    <h2>Último Resultado da Mega-Sena</h2>
+    <h3>Último Resultado da Mega-Sena</h3>
 
     @if (isLoadingApi)
     {
@@ -49,7 +47,7 @@
 
    
     <div class="section">
-        <h2>Gerador de Números</h2>
+        <h3>Gerador de Números</h3>
 
         @if (isGenerating)
         {
@@ -74,6 +72,10 @@
             <button @onclick="GenerateNumbers" disabled="@isGenerating">Gerar</button>
         </div>
     </div>
+
+    <footer style="text-align:center; margin-top:2rem; font-style:italic;">
+        made by Gabwestside ♟️
+    </footer>
 </div>
 
 @code {
