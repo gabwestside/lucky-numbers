@@ -1,0 +1,117 @@
+﻿@page "/"
+
+@using MegaSenaBlazor.Services
+
+@inject MegaSenaService MegaSenaService
+@inject IJSRuntime JS
+
+<PageTitle>Gerador de Números da Sorte</PageTitle>
+
+<div class="container">
+    <audio id="plimSound" src="sounds/plim.mp3" preload="auto"></audio>
+    <h1>Gerador da Sorte 🍀</h1>
+    <h2>Último Resultado da Mega-Sena</h2>
+
+    @if (isLoadingApi)
+    {
+        <div class="loading-area">
+            <div class="clover-loading-group">
+                @for (int i = 0; i < 6; i++)
+                {
+                    <div class="clover-small">🍀</div>
+                }
+            </div>
+            <div class="loading-message">Buscando último sorteio...</div>
+        </div>
+    }
+    else if (latestResult is not null)
+    {
+        <div class="result-detail">
+            <p><strong>Concurso:</strong> @latestResult.DrawNumber</p>
+            <p><strong>Data:</strong> @latestResult.Date</p>
+
+            <div class="numbers">
+                @foreach (var number in latestResult.Numbers.OrderBy(n => n))
+                {
+                    <div class="number-ball">@number</div>
+                }
+            </div>
+
+            <p><strong>Acumulou:</strong>
+                <span style="color:@(latestResult.IsAccumulated ? "red" : "green"); font-weight:bold;">
+                    @(latestResult.IsAccumulated ? "SIM" : "NÃO")
+                </span>
+            </p>
+
+            <p><strong>Próximo Sorteio:</strong> @latestResult.NextDrawDate</p>
+        </div>
+    }
+
+   
+    <div class="section">
+        <h2>Gerador de Números</h2>
+
+        @if (isGenerating)
+        {
+            <div class="clover-loading-group">
+                @for (int i = 0; i < 6; i++)
+                {
+                    <div class="clover-small">🍀</div>
+                }
+            </div>
+        }
+        else if (generatedNumbers.Count > 0)
+        {
+            <div class="numbers">
+                @foreach (var number in revealedNumbers)
+                {
+                    <div class="number-ball generated-ball">@number</div>
+                }
+            </div>
+        }
+
+        <div style="text-align:center; margin-top: 1rem;">
+            <button @onclick="GenerateNumbers" disabled="@isGenerating">Gerar</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<int> generatedNumbers = new();
+    private MegaSenaResult? latestResult;
+    private bool isLoadingApi = true;
+    private bool isGenerating = false;
+    private List<int> revealedNumbers = new();
+
+    private async Task GenerateNumbers()
+    {
+        isGenerating = true;
+        revealedNumbers.Clear();
+
+        await Task.Delay(600);
+
+        var rand = new Random();
+        generatedNumbers = Enumerable
+                            .Range(1, 60)
+                            .OrderBy(_ => rand.Next())
+                            .Take(6)
+                            .ToList();
+
+        foreach (var number in generatedNumbers.OrderBy(n => n))
+        {
+            revealedNumbers.Add(number);
+            await JS.InvokeVoidAsync("playPlim");
+            StateHasChanged();
+            await Task.Delay(400);
+        }
+
+        isGenerating = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoadingApi = true;
+        latestResult = await MegaSenaService.GetLatestResultAsync();
+        isLoadingApi = false;
+    }
+}

@@ -1,0 +1,17 @@
+# Ignorar todos os arquivos .dll, .exe, .pdb e .json em qualquer diretório
+*.dll
+*.exe
+*.pdb
+*.AssemblyInfo.cs
+*.v2
+
+# Ignorar diretórios bin e obj
+bin/
+obj/
+dist/
+docs/
+
+# Ignorar pastas de configuração de IDEs
+.idea/
+.vscode/
+.vs/
