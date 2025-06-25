@@ -12,12 +12,12 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
   deploy:
-    environment: 
+    environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
@@ -40,14 +40,16 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: Publish .NET
-        run: dotnet publish MegaSenaBlazor.csproj -c Release -o docs --no-logo
+        run: dotnet publish MegaSenaBlazor.csproj -c:Release -o docs --nologo
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
-  
+
       - name: Upload
         uses: actions/upload-pages-artifact@v3
-      
+        with:
+          path: 'docs/wwwroot'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
