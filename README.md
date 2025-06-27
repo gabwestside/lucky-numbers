@@ -1,4 +1,4 @@
-# 🎯 MegaSenaBlazor
+# 🍀 Números da Sorte 
 
 Uma aplicação interativa feita com **Blazor WebAssembly**, criada para gerar jogos da Mega-Sena com visual moderno, carregamento animado e recursos extras para quem gosta de apostar com estilo 🍀.
 
