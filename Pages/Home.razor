@@ -7,8 +7,8 @@
 
 <div class="container">
     <audio id="plimSound" src="sounds/plim.mp3" preload="auto"></audio>
-    <h1>Gerador da Sorte 🍀</h1>
-    <h3>Último Resultado da Mega-Sena</h3>
+    <h2>Gerador da Sorte 🍀</h2>
+    <h4>Último Resultado da Mega-Sena</h4>
 
     @if (isLoadingApi)
     {
@@ -36,18 +36,19 @@
             </div>
 
             <p><strong>Acumulou:</strong>
-                <span style="color:@(latestResult.IsAccumulated ? "red" : "green"); font-weight:bold;">
+                <span style="color:@(latestResult.IsAccumulated ? "green" : "red"); font-weight:bold;">
                     @(latestResult.IsAccumulated ? "SIM" : "NÃO")
                 </span>
             </p>
 
             <p><strong>Próximo Sorteio:</strong> @latestResult.NextDrawDate</p>
+
+            <p><strong>Valor Acumulado:</strong> @FormatPrize(latestResult.NextDrawPrize)</p>
         </div>
     }
 
-   
     <div class="section">
-        <h3>Gerador de Números</h3>
+        <h4>Gerador de Números</h4>
 
         @if (isGenerating)
         {
@@ -73,9 +74,39 @@
         </div>
     </div>
 
-    <footer style="text-align:center; margin-top:2rem; font-style:italic;">
-        made by Gabwestside ♟️
-    </footer>
+    <div class="section">
+        <button @onclick="ToggleLastDraws">
+            @(showLastDraws ? "Ocultar últimos 5 resultados" : "Ver últimos 5 resultados")
+        </button>
+
+        @if (isLoadingApi && showLastDraws)
+        {
+            <div class="clover-loading-group">
+                @for (int i = 0; i < 6; i++)
+                {
+                    <div class="clover-small">🍀</div>
+                }
+            </div>
+        }
+
+        @if (showLastDraws && lastFiveResults.Count > 0)
+        {
+            <div class="results-list">
+                @foreach (var result in lastFiveResults)
+                {
+                    <div class="result-detail">
+                        <p><strong>Concurso:</strong> @result.DrawNumber (@result.Date)</p>
+                        <div class="numbers">
+                            @foreach (var n in result.Numbers.OrderBy(n => n))
+                            {
+                                <div class="number-ball">@n</div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
 
 @code {
@@ -84,6 +115,9 @@
     private bool isLoadingApi = true;
     private bool isGenerating = false;
     private List<int> revealedNumbers = new();
+
+    private bool showLastDraws = false;
+    private List<MegaSenaResult> lastFiveResults = new();
 
     private async Task GenerateNumbers()
     {
@@ -94,10 +128,10 @@
 
         var rand = new Random();
         generatedNumbers = Enumerable
-                            .Range(1, 60)
-                            .OrderBy(_ => rand.Next())
-                            .Take(6)
-                            .ToList();
+        .Range(1, 60)
+        .OrderBy(_ => rand.Next())
+        .Take(6)
+        .ToList();
 
         foreach (var number in generatedNumbers.OrderBy(n => n))
         {
@@ -115,5 +149,22 @@
         isLoadingApi = true;
         latestResult = await MegaSenaService.GetLatestResultAsync();
         isLoadingApi = false;
+    }
+
+    private string FormatPrize(double prize)
+    {
+        return prize.ToString("C2", new System.Globalization.CultureInfo("pt-BR"));
+    }
+
+    private async Task ToggleLastDraws()
+    {
+        showLastDraws = !showLastDraws;
+
+        if (showLastDraws && lastFiveResults.Count == 0)
+        {
+            isLoadingApi = true;
+            lastFiveResults = await MegaSenaService.GetLastResultsAsync(5);
+            isLoadingApi = false;
+        }
     }
 }
