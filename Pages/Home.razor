@@ -75,35 +75,45 @@
     </div>
 
     <div class="section">
-        <button @onclick="ToggleLastDraws">
-            @(showLastDraws ? "Ocultar últimos 5 resultados" : "Ver últimos 5 resultados")
-        </button>
+        <div class="section">
+            <button @onclick="OpenLastResultsModal">Ver últimos 5 resultados</button>
+        </div>
 
-        @if (isLoadingApi && showLastDraws)
+        @if (showModal)
         {
-            <div class="clover-loading-group">
-                @for (int i = 0; i < 6; i++)
-                {
-                    <div class="clover-small">🍀</div>
-                }
-            </div>
-        }
+            <div class="modal-backdrop" @onclick="CloseModal">
+                <div class="modal-content" @onclick:stopPropagation>
+                    <h2>Últimos 5 Resultados</h2>
 
-        @if (showLastDraws && lastFiveResults.Count > 0)
-        {
-            <div class="results-list">
-                @foreach (var result in lastFiveResults)
-                {
-                    <div class="result-detail">
-                        <p><strong>Concurso:</strong> @result.DrawNumber (@result.Date)</p>
-                        <div class="numbers">
-                            @foreach (var n in result.Numbers.OrderBy(n => n))
+                    @if (isLoadingApi)
+                    {
+                        <div class="clover-loading-group">
+                            @for (int i = 0; i < 6; i++)
                             {
-                                <div class="number-ball">@n</div>
+                                <div class="clover-small">🍀</div>
                             }
                         </div>
+                    }
+                    else
+                    {
+                        @foreach (var result in lastFiveResults)
+                        {
+                            <div class="result-detail">
+                                <p><strong>Concurso:</strong> @result.DrawNumber (@result.Date)</p>
+                                <div class="numbers">
+                                    @foreach (var n in result.Numbers.OrderBy(n => n))
+                                    {
+                                        <div class="number-ball">@n</div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <div style="text-align:center; margin-top:1rem;">
+                        <button @onclick="CloseModal">Fechar</button>
                     </div>
-                }
+                </div>
             </div>
         }
     </div>
@@ -116,8 +126,8 @@
     private bool isGenerating = false;
     private List<int> revealedNumbers = new();
 
-    private bool showLastDraws = false;
     private List<MegaSenaResult> lastFiveResults = new();
+    private bool showModal = false;
 
     private async Task GenerateNumbers()
     {
@@ -156,15 +166,20 @@
         return prize.ToString("C2", new System.Globalization.CultureInfo("pt-BR"));
     }
 
-    private async Task ToggleLastDraws()
+    private async Task OpenLastResultsModal()
     {
-        showLastDraws = !showLastDraws;
+        showModal = true;
 
-        if (showLastDraws && lastFiveResults.Count == 0)
+        if (lastFiveResults.Count == 0)
         {
             isLoadingApi = true;
             lastFiveResults = await MegaSenaService.GetLastResultsAsync(5);
             isLoadingApi = false;
         }
+    }
+    
+    private void CloseModal()
+    {
+        showModal = false;
     }
 }
