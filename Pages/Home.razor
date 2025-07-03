@@ -43,7 +43,8 @@
 
             <p><strong>Próximo Sorteio:</strong> @latestResult.NextDrawDate</p>
 
-            <p><strong>Valor Acumulado:</strong> @FormatPrize(latestResult.NextDrawPrize)</p>
+            <p><strong>Valor Acumulado:</strong> @FormatPrize(latestResult.NextAccumulatedDrawPrize)</p>
+            <p><strong>Valor Estimado do @latestResult.DrawNumber:</strong> @FormatPrize(latestResult.NextDrawPrize)</p>
         </div>
     }
 
