@@ -24,6 +24,9 @@ namespace MegaSenaBlazor.Services
         public bool IsAccumulated { get; set; }
 
         [JsonPropertyName("valorAcumuladoProximoConcurso")]
+        public double NextAccumulatedDrawPrize { get; set; }
+
+        [JsonPropertyName("valorEstimadoProximoConcurso")]
         public double NextDrawPrize { get; set; }
     }
 
