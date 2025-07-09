@@ -90,6 +90,10 @@
         <p style="text-align:center; color:green; font-weight:bold;">@saveMessage</p>
     }
 
+    <div style="text-align:center; margin-top: 2rem;">
+        <button @onclick="LoadSavedGames">Ver jogos salvos</button>
+    </div>
+
     <div class="section">
         <div class="section">
             <button @onclick="OpenLastResultsModal">Ver últimos 5 resultados</button>
@@ -133,6 +137,35 @@
             </div>
         }
     </div>
+
+    @if (showSavedGamesModal)
+{
+    <div class="modal-overlay" @onclick="() => showSavedGamesModal = false">
+        <div class="modal" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h2>Jogos Salvos 🍀</h2>
+                <button class="close-btn" @onclick="() => showSavedGamesModal = false">❌</button>
+            </div>
+
+            @if (savedGames.Count == 0)
+            {
+                <p>Nenhum jogo salvo ainda.</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (var game in savedGames.OrderByDescending(g => g.CreatedAt))
+                    {
+                        <li style="margin-bottom: 1rem;">
+                            <strong>@game.CreatedAt.ToString("dd/MM/yyyy HH:mm"):</strong><br />
+                            @string.Join(", ", game.Numbers.OrderBy(n => n))
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+}
 </div>
 
 @code {
@@ -146,6 +179,8 @@
     private bool showModal = false;
 
     private string? saveMessage;
+    private bool showSavedGamesModal = false;
+    private List<SavedGame> savedGames = new();
 
     private async Task GenerateNumbers()
     {
@@ -214,5 +249,11 @@
             await LocalStorageService.SaveGameAsync(game);
             saveMessage = "Jogo salvo com sucesso! 🍀";
         }
+    }
+
+    private async Task LoadSavedGames()
+    {
+        savedGames = await LocalStorageService.GetSavedGamesAsync();
+        showSavedGamesModal = true;
     }
 }
