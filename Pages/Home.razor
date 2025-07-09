@@ -1,6 +1,9 @@
 ﻿@page "/"
 
+@using MegaSenaBlazor.Models
 @using MegaSenaBlazor.Services
+
+@inject LocalStorageService LocalStorageService
 
 @inject MegaSenaService MegaSenaService
 @inject IJSRuntime JS
@@ -75,6 +78,18 @@
         </div>
     </div>
 
+    @if (generatedNumbers.Count == 6)
+    {
+        <div style="text-align:center; margin-top:0.5rem;">
+            <button @onclick="SaveGeneratedGame">Salvar jogo</button>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(saveMessage))
+    {
+        <p style="text-align:center; color:green; font-weight:bold;">@saveMessage</p>
+    }
+
     <div class="section">
         <div class="section">
             <button @onclick="OpenLastResultsModal">Ver últimos 5 resultados</button>
@@ -130,6 +145,8 @@
     private List<MegaSenaResult> lastFiveResults = new();
     private bool showModal = false;
 
+    private string? saveMessage;
+
     private async Task GenerateNumbers()
     {
         isGenerating = true;
@@ -178,9 +195,24 @@
             isLoadingApi = false;
         }
     }
-    
+
     private void CloseModal()
     {
         showModal = false;
+    }
+
+    private async Task SaveGeneratedGame()
+    {
+        if (generatedNumbers.Count == 6)
+        {
+            var game = new SavedGame
+            {
+                Numbers = new List<int>(generatedNumbers),
+                CreatedAt = DateTime.Now
+            };
+
+            await LocalStorageService.SaveGameAsync(game);
+            saveMessage = "Jogo salvo com sucesso! 🍀";
+        }
     }
 }
