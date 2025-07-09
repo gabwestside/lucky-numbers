@@ -1,6 +1,9 @@
 ﻿@page "/"
 
+@using MegaSenaBlazor.Models
 @using MegaSenaBlazor.Services
+
+@inject LocalStorageService LocalStorageService
 
 @inject MegaSenaService MegaSenaService
 @inject IJSRuntime JS
@@ -75,6 +78,17 @@
         </div>
     </div>
 
+    @if (generatedNumbers.Count == 6 && showSaveButton && savedGames.Count < MaxSavedGames)
+    {
+        <div style="text-align:center; margin-top:1rem;">
+            <button @onclick="SaveCurrentGameAsync">Salvar jogo</button>
+        </div>
+    }
+
+    <div style="text-align:center; margin-top: 2rem;">
+        <button @onclick="LoadSavedGames">Ver jogos salvos</button>
+    </div>
+
     <div class="section">
         <div class="section">
             <button @onclick="OpenLastResultsModal">Ver últimos 5 resultados</button>
@@ -118,7 +132,63 @@
             </div>
         }
     </div>
+
+    @if (showSavedGamesModal)
+    {
+        <div class="modal-overlay" @onclick="() => showSavedGamesModal = false">
+            <div class="modal" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h2>Jogos Salvos 🍀</h2>
+                    <button class="close-btn" @onclick="() => showSavedGamesModal = false">❌</button>
+                </div>
+
+                @if (savedGames.Count == 0)
+                {
+                    <p>Nenhum jogo salvo ainda.</p>
+                }
+                else
+                {
+                    <ul>
+                        @foreach (var game in savedGames.OrderByDescending(g => g.CreatedAt))
+                        {
+                            <li class="saved-game">
+                                <div>
+                                    <strong>@game.CreatedAt.ToString("dd/MM/yyyy HH:mm")</strong><br />
+                                    <span>@string.Join(", ", game.Numbers.OrderBy(n => n))</span><br />
+                                    <span style="color:@(game.Played ? "green" : "gray"); font-weight:bold;">
+                                        @(game.Played ? "✅ Jogado" : "⏳ Não jogado")
+                                    </span>
+                                </div>
+
+                                <div class="saved-actions">
+                                    <button @onclick="() => TogglePlayed(game)">
+                                        @(game.Played ? "Desmarcar" : "Marcar como jogado")
+                                    </button>
+
+                                    <button class="delete" @onclick="() => DeleteGame(game)">
+                                        Excluir
+                                    </button>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    }
+
+    @if (savedGames.Count > MaxSavedGames)
+    {
+        <p style="text-align:center; color:orangered;">Limite de 5 jogos salvos atingido.</p>
+    }
 </div>
+
+@if (showToast)
+{
+    <div class="toast">
+        Jogo salvo com sucesso! 🍀
+    </div>
+}
 
 @code {
     private List<int> generatedNumbers = new();
@@ -129,6 +199,13 @@
 
     private List<MegaSenaResult> lastFiveResults = new();
     private bool showModal = false;
+
+    private bool showSavedGamesModal = false;
+    private List<SavedGame> savedGames = new();
+
+    private bool showSaveButton = true;
+    private bool showToast = false;
+    private const int MaxSavedGames = 5;
 
     private async Task GenerateNumbers()
     {
@@ -153,6 +230,7 @@
         }
 
         isGenerating = false;
+        showSaveButton = true;
     }
 
     protected override async Task OnInitializedAsync()
@@ -178,9 +256,54 @@
             isLoadingApi = false;
         }
     }
-    
+
     private void CloseModal()
     {
         showModal = false;
+    }
+
+    private async Task LoadSavedGames()
+    {
+        savedGames = await LocalStorageService.GetSavedGamesAsync();
+        showSavedGamesModal = true;
+    }
+
+    private async Task DeleteGame(SavedGame game)
+    {
+        savedGames.Remove(game);
+        await LocalStorageService.SaveAllGamesAsync(savedGames);
+    }
+
+    private async Task TogglePlayed(SavedGame game)
+    {
+        game.Played = !game.Played;
+        await LocalStorageService.SaveAllGamesAsync(savedGames);
+    }
+
+    private async Task SaveCurrentGameAsync()
+    {
+        var existing = await LocalStorageService.GetSavedGamesAsync();
+
+        if (existing.Count >= MaxSavedGames)
+            return;
+
+        var newGame = new SavedGame
+        {
+            Numbers = new List<int>(generatedNumbers),
+            CreatedAt = DateTime.Now,
+            Played = false
+        };
+
+        await LocalStorageService.SaveGameAsync(newGame);
+
+        showSaveButton = false;
+        showToast = true;
+
+        await Task.Delay(2000);
+        showToast = false;
+
+        savedGames = await LocalStorageService.GetSavedGamesAsync();
+
+        StateHasChanged();
     }
 }
