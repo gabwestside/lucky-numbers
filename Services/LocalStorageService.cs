@@ -21,7 +21,7 @@ public class LocalStorageService
     if (!existing.Any(g => g.Numbers.OrderBy(n => n).SequenceEqual(game.Numbers.OrderBy(n => n))))
     {
       existing.Add(game);
-      
+
       var json = JsonSerializer.Serialize(existing);
 
       await _jsRuntime.InvokeVoidAsync("localStorage.setItem", Key, json);
@@ -35,6 +35,13 @@ public class LocalStorageService
     return string.IsNullOrEmpty(json)
         ? []
         : JsonSerializer.Deserialize<List<SavedGame>>(json)!;
+  }
+
+  public async Task SaveAllGamesAsync(List<SavedGame> games)
+  {
+    var json = JsonSerializer.Serialize(games);
+    
+    await _jsRuntime.InvokeVoidAsync("localStorage.setItem", Key, json);
   }
 }
 
