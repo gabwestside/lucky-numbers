@@ -148,21 +148,21 @@
                 }
                 else
                 {
-                    <ul>
+                    <ul class="card-list">
                         @foreach (var game in savedGames.OrderByDescending(g => g.CreatedAt))
                         {
                             <li class="saved-game">
                                 <div>
-                                    <strong>@game.CreatedAt.ToString("dd/MM/yyyy HH:mm")</strong><br />
-                                    <span>@string.Join(", ", game.Numbers.OrderBy(n => n))</span><br />
-                                    <span style="color:@(game.Played ? "green" : "gray"); font-weight:bold;">
+                                    <span style="font-size: 12px;">@game.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span><br />
+                                    <span style="font-weight: bold;">@string.Join(", ", game.Numbers.OrderBy(n => n))</span><br />
+                                    <span style="color:@(game.Played ? "green" : "gray"); font-size:12px;">
                                         @(game.Played ? "✅ Jogado" : "⏳ Não jogado")
                                     </span>
                                 </div>
 
                                 <div class="saved-actions">
                                     <button @onclick="() => TogglePlayed(game)">
-                                        @(game.Played ? "Desmarcar" : "Marcar como jogado")
+                                        @(game.Played ? "Desmarcar" : "Marcar")
                                     </button>
 
                                     <button class="delete" @onclick="() => DeleteGame(game)">
