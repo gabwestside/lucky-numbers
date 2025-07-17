@@ -4,9 +4,9 @@
 @using MegaSenaBlazor.Services
 
 @inject LocalStorageService LocalStorageService
-
 @inject MegaSenaService MegaSenaService
 @inject IJSRuntime JS
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <div class="container">
     <audio id="plimSound" src="sounds/plim.mp3" preload="auto"></audio>
@@ -181,6 +181,8 @@
     {
         <p style="text-align:center; color:orangered;">Limite de 5 jogos salvos atingido.</p>
     }
+    
+    <button @onclick="ToggleDarkMode">@(isDarkMode ? "☀️ Claro" : "🌙 Escuro")</button>
 </div>
 
 @if (showToast)
@@ -238,6 +240,9 @@
         isLoadingApi = true;
         latestResult = await MegaSenaService.GetLatestResultAsync();
         isLoadingApi = false;
+
+        isDarkMode = await localStorage.GetItemAsync<bool>("dark-mode");
+        await SetTheme();
     }
 
     private string FormatPrize(double prize)
@@ -305,5 +310,20 @@
         savedGames = await LocalStorageService.GetSavedGamesAsync();
 
         StateHasChanged();
+    }
+
+    private bool isDarkMode;
+
+    private async Task ToggleDarkMode()
+    {
+        isDarkMode = !isDarkMode;
+        await localStorage.SetItemAsync("dark-mode", isDarkMode);
+        await SetTheme();
+    }
+
+    private async Task SetTheme()
+    {
+        var jsModule = await JS.InvokeAsync<IJSObjectReference>("import", "./scripts/theme.js");
+        await jsModule.InvokeVoidAsync("setTheme", isDarkMode);
     }
 }

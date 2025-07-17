@@ -1,8 +1,6 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f7f7f7;
   margin: 0;
-  /* padding: 1rem; */
 }
 
 .container {
@@ -124,6 +122,7 @@ button:hover {
 #blazor-error-ui .dismiss {
   cursor: pointer;
   margin-left: 1rem;
+  color: #721c24;
 }
 
 .loading-area {
@@ -337,4 +336,38 @@ button:hover {
   to {
     opacity: 0;
   }
+}
+
+:root {
+  --background-color: #f4f4f4;
+  --text-color: #222;
+  --card-color: #fff;
+  --ball-color: #2e7d32;
+  --ball-text-color: #fff;
+}
+
+.dark-mode {
+  --background-color: #121212;
+  --text-color: #f4f4f4;
+  --card-color: #1e1e1e;
+  --ball-color: #43a047;
+  --ball-text-color: #fff;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.container, .section, .result-detail {
+  background-color: var(--card-color);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.number-ball {
+  background-color: var(--ball-color);
+  color: var(--ball-text-color);
+  font-weight: bold;
 }

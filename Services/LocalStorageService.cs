@@ -40,7 +40,7 @@ public class LocalStorageService
   public async Task SaveAllGamesAsync(List<SavedGame> games)
   {
     var json = JsonSerializer.Serialize(games);
-    
+
     await _jsRuntime.InvokeVoidAsync("localStorage.setItem", Key, json);
   }
 }
